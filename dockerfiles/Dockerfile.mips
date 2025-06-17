@@ -1,0 +1,28 @@
+FROM alpine:latest
+
+RUN apk add --no-cache \
+    build-base \
+    wget \
+    bzip2 \
+    ncurses-dev \
+    bc \
+    git \
+    qemu-mips
+
+WORKDIR /workspace
+
+RUN wget -q https://musl.cc/mips-linux-musl-cross.tgz && \
+    mkdir -p /opt && \
+    tar -xzf mips-linux-musl-cross.tgz -C /opt && \
+    rm mips-linux-musl-cross.tgz && \
+    ln -s /opt/mips-linux-musl-cross /opt/mips-toolchain
+
+ENV BUILD_DIR=/build
+ENV ARCH=mips
+ENV CROSS_COMPILE=/opt/mips-toolchain/bin/mips-linux-musl-
+
+COPY scripts scripts
+
+RUN chmod +x scripts/*.sh
+
+CMD ["/bin/sh"]
